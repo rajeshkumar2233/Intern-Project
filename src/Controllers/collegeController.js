@@ -63,11 +63,15 @@ const createCollege = async function (req, res) {
 }
 
 
-//--------------------------------------------------- Get Colleges with applicable intern ---------------------------------------------------------
+//-===================================== Get Colleges with applicable intern ===================================================
 
 
 const getcollegeDetails = async function (req, res) {
+
     try {
+
+        res.setHeader('Access-Control-Allow-Origin', '*')
+
         let collegeName = req.query.collegeName
         if (!(collegeName)) return res.status(400).send({ status: false, message: "please enter name" })
         if (!isValidname(collegeName)) return res.status(400).send({ status: false, message: "enter valid collegeName" })
@@ -79,15 +83,18 @@ const getcollegeDetails = async function (req, res) {
 
         let findIntern = await internModel.find({ collegeId: collegeid }).select({ _id: 1, name: 1, email: 1, mobile: 1 })
 
-        if (findIntern.length == 0) findIntern = "No intern applicable"
+        if (findIntern.length == 0) // return res.status(404).send({ status: false, message: `No Internship applications submitted at ${collegeName} till now.` })
 
+        findIntern = "No intern applicable"
+  
 
         const allinterns = {
-            "name": collegeDetail.name,
-            "fullname": collegeDetail.fullName,
-            "logoLink": collegeDetail.logoLink,
-            "isDeleted": collegeDetail.isDeleted,
-            "intern": findIntern
+            name: collegeDetail.name,
+            fullName: collegeDetail.fullName,
+            logoLink: collegeDetail.logoLink,
+            isDeleted: collegeDetail.isDeleted,
+            interns: findIntern
+           
         }
 
         return res.status(200).send({ status: true, message: "Internship application successfull", data: allinterns })
